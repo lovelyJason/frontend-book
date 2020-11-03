@@ -34,16 +34,11 @@ class Promise {
     this.status = FULFILLED;
     // 保存成功的值
     this.value = value;
-
-    // 判断成功回调是否存在
-    this.successCallback && this.successCallback();
   };
   reject = (error) => {
     if (this.status !== PENDING) return;
     this.status = REJECTED;
     this.error = error;
-
-    this.failCallback && this.failCallback();
   };
   then(successCallback, failCallback) {
     if (this.status === FULFILLED) {
@@ -98,6 +93,9 @@ var p = new Promise((resolve, reject) => {
   }, 200)
 })
 
+p.then(res => {
+  console.log(res)
+})
 p.then(res => {
   console.log(res)
 })
@@ -367,3 +365,78 @@ static all (array) {
   })
 }
 ```
+
+### Promise.resolve
+
+Promise.resolve()可以传入普通值或者Promise对象,都会创建一个Promise对象;如果传入的是一个Promise对象,那么该方法会原封不动的把这个Promise对象作为Promise.resolve()的返回值
+
+```javascript
+static resolve (value) {
+  if(value instanceof Promsie) return value
+  return new Promise(resolve => resolve(value))
+}
+
+//调用
+function p1 () {
+  return new Promise(function (resolve, reject) {
+    setTimeout(() => {
+      resolve('p1')
+    }, 1000);
+  })
+}
+
+function p2 () {
+  return new Promise(function (resolve, reject) {
+    resolve('p2')
+  })
+}
+
+Promise.resolve(100).then(value => console.log(value))
+Promise.resolve(p1().then(value => console.log(value)))
+```
+
+### Promise.prototype.finally
+
+- 无论成功还是失败,最终都会执行一次
+- 可以链式调用then方法拿到finally最终的结果,因此返回一个Promise对象
+
+```javascript
+finally (callback) {
+  return this.then((value) => {
+    callback()    // 如果finally调用时返回了另外的Promise对象,此处没有等待其状态变更就立即返回了value
+    return value
+  }, (error) => {
+    callback()
+    throw error   // 将错误结果传递到下一个then的失败回调中
+  })
+}
+
+p2().finally(() => {
+  console.log('finally')
+  return p1()   // 注意,这个地方后面的then虽然是为了p1()返回的Promise注册的回调,但是then回调中的值不是p1,仍然是p2自身
+}).then(value => {
+  console.log(value) 
+})
+
+```
+因此
+```javascript
+finally (callback) {
+  return this.then((value) => {
+    // 借用resolve静态方法包装为Promise对象
+    return Promise.resolve((callback()).then(newValue => value)
+  }, (error) => {
+    return Promise.resolve(callback()).then(() => throw error)
+  })
+}
+```
+
+### Promise.prototype.catch
+
+```javascript
+catch (failCallback) {
+  return this.then(undefined, callback)
+}
+```
+
+**完整代码**

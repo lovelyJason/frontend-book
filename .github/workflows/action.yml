@@ -1,0 +1,26 @@
+name: MainWorkflow
+on: push
+jobs: 
+  Sftp-Deploy-Action:
+    name: Sftp-Deploy-Action
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        fetch-depth: 2
+    - name: Use Node.js 10.22.0
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.16.3'
+    - name: Build Project
+      run: yarn && yarn clean && yarn init && yarn gitbook build
+    - name: List output files
+      run: ls -a _book
+    - name: Sftp-Deploy-Action
+      uses: SamKirkland/FTP-Deploy-Action@3.0.0
+      with: 
+        ftp-server: sftp://${{ secrets.FTP_IP }}
+        ftp-username: ${{ secrets.FTP_USERNAME }}
+        ftp-password: ${{ secrets.FTP_PASSWORD }}
+        git-ftp-args: --insecure --remote-root /home/www/htdocs
+        local-dir: _book/

@@ -1,0 +1,54 @@
+Arguments: 
+  /Users/jasonhuang/.nvm/versions/node/v10.22.0/bin/node /Users/jasonhuang/.nvm/versions/node/v10.22.0/bin/yarn add gitbook --save
+
+PATH: 
+  /Users/jasonhuang/.nvm/versions/node/v10.22.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Users/jasonhuang/.nvm/versions/node/v10.22.0/bin:/Users/jasonhuang/Library/Android/sdk/tools:/Users/jasonhuang/Library/Android/sdk/tools/bin:/Users/jasonhuang/Library/Android/sdk/platform-tools:/Users/jasonhuang/Library/Android/sdk/emulator:/Users/jasonhuang/Library/Android/sdk/tools:/Users/jasonhuang/Library/Android/sdk/tools/bin:/Users/jasonhuang/Library/Android/sdk/platform-tools:/Users/jasonhuang/Library/Android/sdk/emulator
+
+Yarn version: 
+  1.22.10
+
+Node version: 
+  10.22.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: connect ECONNREFUSED 0.0.0.0:443
+      at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1107:14)
+
+npm manifest: 
+  {
+    "name": "frontend-book",
+    "version": "1.0.0",
+    "description": "## test",
+    "main": "index.js",
+    "dependencies": {
+      "gitbook-plugin-anchor-navigation-ex": "^1.0.14",
+      "gitbook-plugin-back-to-top-button": "^0.1.4",
+      "gitbook-plugin-click-reveal": "^1.0.0",
+      "gitbook-plugin-codeblock-filename": "^0.0.9",
+      "gitbook-plugin-copy-code-button": "0.0.2",
+      "gitbook-plugin-expandable-chapters": "^0.2.0",
+      "gitbook-plugin-hide-element": "0.0.4",
+      "gitbook-plugin-lightbox": "^1.2.0",
+      "gitbook-plugin-splitter": "^0.0.8",
+      "gitbook-plugin-tbfed-pagefooter": "0.0.1",
+      "install": "^0.13.0",
+      "npm": "^6.14.8"
+    },
+    "devDependencies": {},
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "build": "gitbook build"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
