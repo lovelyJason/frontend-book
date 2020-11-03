@@ -13,7 +13,7 @@ jobs:
       with:
         node-version: '12.16.3'
     - name: Build Project
-      run: yarn && yarn init && yarn gitbook build
+      run: yarn && yarn gitbook init && yarn gitbook build
     - name: List output files
       run: ls -a _book
     - name: Sftp-Deploy-Action
