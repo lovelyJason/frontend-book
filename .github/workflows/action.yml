@@ -16,7 +16,7 @@ jobs:
       run: yarn && yarn gitbook init && yarn gitbook build
     - name: List output files
       run: ls -a _book
-    - name check git status
+    - name: chec git status
       run: git status && git reset --hard
     - name: Sftp-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@3.0.0
