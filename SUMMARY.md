@@ -11,6 +11,9 @@
     * [函数式编程](posts/javascript/函数式编程.md)
     * [异步编程](posts/javascript/异步编程.md)
     * [手写Promise源码](posts/javascript/手写Promise源码.md)
+    * [ECMAScript新特性](posts/javascript/ECMAScript新特性.md)
+    * [typescript](posts/javascript/typescript.md)
+    * [javascript性能优化](posts/javascript/javascript性能优化.md)
 * 正则表达式
 * 浏览器
 
