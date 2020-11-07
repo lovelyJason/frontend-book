@@ -22,5 +22,5 @@ jobs:
         ftp-server: sftp://${{ secrets.FTP_IP }}
         ftp-username: ${{ secrets.FTP_USERNAME }}
         ftp-password: ${{ secrets.FTP_PASSWORD }}
-        git-ftp-args: --insecure --remote-root /home/www/htdocs
+        git-ftp-args: --insecure --remote-root /root
         local-dir: _book/
