@@ -1,2 +1,4 @@
 /drafts
 /node_modules
+.gitignore
+.git-ftp-include
