@@ -124,3 +124,17 @@ const res = createArray<string>(3, 'aa')
 ```typescript
 declare function camelCase (input: string): string
 ```
+
+注意: ts只能对语法层面上的代码进行转换,不会polyfill api
+
+core-js基本上把能polyfill的api都实现了,在文件开头引入core-js即可
+也可以使用babel自动化的polyfill
+
+很多第三方包没有类型补充说明,可以从npm模块@types/下载
+
+生成类型声明文件:
+对于ts项目,可以打开tsconfig.json中的declaration选项
+对于js项目,通过tsd工具可以生成类型声明文件
+
+---
+
