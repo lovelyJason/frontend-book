@@ -1,5 +1,43 @@
 # typescript
 
+## 安装&使用
+
+```bash
+yarn add typescript
+yarn tsc index.ts
+```
+此时项目下的index.ts代码会被转化为js代码,且es6等特性代码也会被转换
+
+tsc不仅能够编译ts文件,也能编译整个项目文件,此时,我们要准备个配置文件
+
+生成tsconfig.json配置文件
+```bash
+yarn tsc --init
+```
+
+tsconfig.json
+```json
+{
+  "compilerOptions" : {
+    "target": "es5",   /* 设定编译后的代码采取的ECMAScript标准 */
+    "module": "commonjs",  /* 输出的代码采取的模块化规范 */
+    "outDir": "./",  /* 编译结果输出的文件夹 */
+    "rootDir": "src",  /* 配置源代码所在文件夹 */
+    "sourceMap": true,
+    "strict": true    /* 开启严格的类型检查, 即使是any类型也要指明,而不是隐式推断*/
+  }
+}
+```
+
+## 作用域问题
+
+ts文件中变量默认为全局的,即作用域也是全局的,隔离作用域可以使用自执行函数或者使用es module,那么文件就会作为一个模块
+
+```javascript
+// 只是export的语法,并不是导出了一个空对象
+export {}
+```
+
 ## typescript类的使用
 
 ```typescript
@@ -128,7 +166,34 @@ declare function camelCase (input: string): string
 注意: ts只能对语法层面上的代码进行转换,不会polyfill api
 
 core-js基本上把能polyfill的api都实现了,在文件开头引入core-js即可
-也可以使用babel自动化的polyfill
+对于Object.defineProperty,完全无法polyfill
+Promise 微任务,用宏任务代替
+
+也可以使用babel自动化的polyfill,编译后的js会自动引入core-js最小的模块
+其中
+
+`@babel/cli`提供babel转换的cli命令
+`@babel/core`提供代码转换的核心库
+`@babel.preset-env`转换预置插件,根据环境转换特性
+`@babel/typescript`移除代码中的ts特性
+
+babel.config.js
+```javascript
+module.exports = {
+  presets: [
+    [
+      '@babel/env',
+      {
+        useBuildIns: 'usage',     // 内置api: 根据使用是否加入core-js的引用
+        corejs: {
+          version: 3    // babel默认引用2.x的core-js
+        }
+      }
+    ],
+    '@babel/typescript'
+  ]
+}
+```
 
 很多第三方包没有类型补充说明,可以从npm模块@types/下载
 

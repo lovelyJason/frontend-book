@@ -6,6 +6,7 @@
 ```bash
 yarn global add yo
 yarn global add generator-node
+yo node
 ```
 
 当需要在已有的项目基础之上创建一些文件,可以使用sub generator

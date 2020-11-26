@@ -15,7 +15,8 @@
     * [typescript](posts/javascript/typescript.md)
     * [javascript性能优化](posts/javascript/javascript性能优化.md)
 * 前端工程化
-  * [gulp](posts/engineering/gulp.md)
+    * [yeoman](posts/engineering/yeoman.md)
+    * [gulp](posts/engineering/gulp.md)
 * 正则表达式
 * 浏览器
 
