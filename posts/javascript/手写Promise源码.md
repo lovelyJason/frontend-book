@@ -403,7 +403,7 @@ Promise.resolve(p1().then(value => console.log(value)))
 ```javascript
 finally (callback) {
   return this.then((value) => {
-    callback()    // 如果finally调用时返回了另外的Promise对象,此处没有等待其状态变更就立即返回了value
+    callback()    // bug: 如果finally调用时返回了另外的Promise对象,此处没有等待其状态变更就立即返回了value,错误的
     return value
   }, (error) => {
     callback()
@@ -415,7 +415,7 @@ p2().finally(() => {
   console.log('finally')
   return p1()   // 注意,这个地方后面的then虽然是为了p1()返回的Promise注册的回调,但是then回调中的值不是p1,仍然是p2自身
 }).then(value => {
-  console.log(value) 
+  console.log(value)    // p2
 })
 
 ```
