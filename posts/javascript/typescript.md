@@ -162,6 +162,8 @@ const res = createArray<string>(3, 'aa')
 ```typescript
 declare function camelCase (input: string): string
 ```
+------
+关于babel
 
 注意: ts只能对语法层面上的代码进行转换,不会polyfill api
 
@@ -172,28 +174,145 @@ Promise 微任务,用宏任务代替
 也可以使用babel自动化的polyfill,编译后的js会自动引入core-js最小的模块
 其中
 
+presets预设是的babel一组插件的集合,避免了根据特性去添加不同插件的繁杂,而preset-env会根据环境决定哪些转,哪些不转
+
 `@babel/cli`提供babel转换的cli命令
 `@babel/core`提供代码转换的核心库
-`@babel.preset-env`转换预置插件,根据环境转换特性
-`@babel/typescript`移除代码中的ts特性
+`@babel/preset-env`转换预置插件,根据环境转换特性
+`@babel/preset-typescript`移除代码中的ts特性
+
+> babel解析plugins的顺序是从前往后,解析presets顺序是从后往前,且会先执行plugins中的插件,再执行presets
 
 babel.config.js
 ```javascript
 module.exports = {
   presets: [
     [
-      '@babel/env',
+      '@babel/env',   // 同@babel/preset-env写法相同
       {
-        useBuildIns: 'usage',     // 内置api: 根据使用是否加入core-js的引用
+        useBuiltIns: 'usage',     // js内置api: 根据使用是否加入core-js的引用,即按需注入,babel7新特性,这样就不需要在代码中import @babel/polyfill
         corejs: {
-          version: 3    // babel默认引用2.x的core-js
-        }
+          version: 3    // 配置了useBuiltIns为entry或usage时同时要设置该项,babel默认引用2.x的core-js,很多新特性已经不会添加了
+        },
+        modules: false    // 转换后代码的模块化,如amd,umd,false代表关闭模块化转换
       }
     ],
-    '@babel/typescript'
+    '@babel/typescript'   // 不会做ts语法检查,只是移除类型注解
   ]
 }
 ```
+
+现在我们有一个这样的index.js
+
+```javascript
+import 'core-js'
+
+var obj = {
+  name: 'zs',
+  age: '18'
+};
+var entries = Object.entries(obj);
+console.log(entries);
+var arr = [1, 2, 3, 4].map(function (val) {
+  (function (item) {
+    return item + 1;
+  });
+});
+console.log(arr);
+console.log(new Promise());
+```
+执行`babel index.js --out-file dist.bundle.js`
+
+默认@babel/preset-env只会转换语法,如箭头函数转换为普通函数,const转换为var,不会转换内置对象,实例方法等,这些需要polyfill,如Promise, Array.prototype.map, Object.entries.需要进行额外配置
+
+useBuildIns有三个可选值,entry, usage, false
+
+- entry: 需要在打包入口或者文件入口显式引入@babel/polyfill(babel7以后使用core-js),然后会根据项目下配置的.browserslistrc来引入所需的polyfill,不管你需不要要,此时文件开头会引入很多的core-js相应模块,造成打包体积大,且污染全局
+
+一个常用的.browserslistrc应该如下
+
+```
+> 1%
+last 2 versions
+not dead
+```
+
+此时的bundle.js开头会require引入`core-js`中的模块,会发现很多都是用不到的
+
+- usage: 会参考目标浏览器和代码中使用的特性按需加载polyfill
+
+删除掉首部引入的core-js,重新编译
+
+此时的bundle.js如下
+```javascript
+"use strict";
+
+require("core-js/modules/es.array.map.js");
+
+require("core-js/modules/es.object.entries.js");
+
+require("core-js/modules/es.object.to-string.js");
+
+require("core-js/modules/es.promise.js");
+
+var obj = {
+  name: 'zs',
+  age: '18'
+};
+var entries = Object.entries(obj);
+console.log(entries);
+var arr = [1, 2, 3, 4].map(function (val) {
+  (function (item) {
+    return item + 1;
+  });
+});
+console.log(arr);
+console.log(new Promise());
+
+```
+
+- false: 不引入polyfill
+
+你以为这样就结束了吗,然而还有问题.
+
+1. babel'的polyfill机制是在当前文件或模块下全局进行修改,如果是静态方法,直接在构造函数上添加,如Array.from,对于实例方法,在原型上添加,如Array.prototype.includes
+这样的后果是,如果别的第三方库也进行这个操作,发生冲突问题,在我们的编程范式中,应该避免这种问题,尽量不要修改全局变量,全局变量原型
+
+2. 看这样一段代码
+
+```javascript
+class Person {}
+```
+
+它经过babel转换后应该是这样子的
+```javascript
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Person = function Person() {
+  _classCallCheck(this, Person);
+};
+```
+
+babel在转换新特性的api时,有时会使用辅助函数,假如我们很多文件都有一些类似的api,最终打包产物里产生了无数个重复的函数
+此时@babel/plugin-trasform-runtime就是解决以上两个问题.
+
+`@babel/plugin-transform-runtime`作用是以沙箱垫片的形式防止污染全局,并抽离辅助函数helper从统一地方引入,并且引入的对象和全局变量是隔离的
+
+```bash
+npm install @babel/plugin-transform-runtime -D
+```
+
+此时上面代码转译为
+
+```javascript
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var Person = function Person() {
+  (0, _classCallCheck2.default)(this, Person);
+};
+```
+
+------
 
 很多第三方包没有类型补充说明,可以从npm模块@types/下载
 

@@ -10,6 +10,8 @@ entry必须为相对路径,output.path必须为绝对路径,publicPath的末尾/
 
 如果代码不能折叠,打开vscode的设置,搜索folding,将折叠策略从indentation改为auto
 
+注意webpack-cli 3.x版本打包后的结果中自调用函数参数modules为数组,4.x为对象
+
 ## loader
 
 常用loader分类
@@ -205,19 +207,19 @@ devServer: {
 
 ### Source Map
 
-js中加载source map的语法
+js中加载source map的语法,注意很多库源码中已去除了此注释
 
 ```javascript
 //# sourceMappingURL=jquery-3.4.min.map
 ```
 
-此时开发人员工具开启了Source Map功能后,浏览器就会请求对应的sourcemap文件,就可以调试非压缩的源代码
+此时开发人员工具开启了Source Map功能后,浏览器就会请求对应的sourcemap文件,逆向解析出来源代码,就可以调试非压缩的源代码
 
 webpack中配置Source Map,通过配置项devtool
 
 ![image-20201221135225631](/Users/jasonhuang/Library/Application Support/typora-user-images/image-20201221135225631.png)
 
-eval: 不生成map文件,将打包后的每个模块中的代码放到eval中，并且添加source map路径
+- eval: 不生成map文件,将打包后的每个模块中的代码放到eval中，并且添加source map路径
 
 如`eval("...//# sourceaURL=webpack://webpack-demo/./src/main.js?")`
 
@@ -225,11 +227,19 @@ eval: 不生成map文件,将打包后的每个模块中的代码放到eval中，
 
 > webpack配置文件可以导出一个数组,数组中每个元素为一个打包配置,从而可以根据多套配置进行不同的打包任务
 
-eval-source-map: 生成了souce map,可以定位行数和列数
-cheap-eval-source-map: 阉割版的eval-source-map,只能定位行数
-cheap-module-source-map: 没有经过loader加工过的源代码,而不带module是加工后的结果,会将es6特性进行转换
-inline-source-map: source map文件以dataURL形式嵌入到代码当中,代码文件会变大很多
-nosources-source-map: 点击错误进入后,看不到代码段,但是能定位到代码的行数和列数,方便生产环境保护源代码
+- hidden-source-map: 生成source map文件,但代码中不通过注释引入
+- eval-source-map: 生成了souce map,可以定位行数和列数,使用行内方式嵌入source map
+- cheap-eval-source-map: 阉割版的eval-source-map,只能定位行数,会经过loader转换
+  如将const变为var
+- cheap-module-eval-source-map: 没有经过loader加工过的源代码,而不带module是加工后的结果,会将es6特性进行转换
+- inline-source-map: source map文件以dataURL形式嵌入到代码当中,代码文件会变大很多
+- nosources-source-map: 点击错误进入后,看不到代码段,但是能定位到代码的行数和列数,方便生产环境保护源代码
+
+总的来说
+
+- eval: 是否使用eval执行代码
+- cheap: 是否包含行信息
+- module: 是否能得到loader转换前的代码
 
 #### 使用选择
 
@@ -520,20 +530,211 @@ module.exports = {
 
 ## lint
 
+lint,即代码检查.关于项目中的代码检查,在多人协作时显得尤为重要,而繁杂的配置让很多开发人员望而却步.
+
 ### eslint
 
-创建配置文件
+**创建配置文件**
 
 ```bash
 npx eslint --init
 ```
 
+当然你也可以在项目下的package.json中指定eslintConfig字段来进行配置
+
 交互式的选择你的eslint配置,随后会下载模块eslint,eslint-loader,eslint-plugin-vue等,如果选择了standard还会下载eslint-config-standard
 
+.eslintrc.js
+```javascript
+module.exports = {
+  env: {    // 环境不是互斥的
+    browser: false, 
+    es6: true   // 或则es2015
+  },
+  extends: [      // 有顺序
+    'eslint:recommended',
+    'standard',   // 来自于eslint-config-standard
+  ]
+  rules: {
+    'react-jsx/uses-react': 2   // 开启设置'error'或2, 可选项有'off','warn','error'
+  },
+  plugins: [
+    'react'     // eslint-plugin-react,然后就可以使用插件中配置的规则
+  ],
+  parseOptions: {     // 设置语法解析器
+    ecmaVersion: 2015   // 检测语法是否可用,当前环境的具体成员是否可用要通过env配置
+  },
+  globals: {    // 可以使用的全局变量,如jquery
+
+  }
+}
+```
+
+如果你使用vue开发,需要用到eslint-plugin-react插件,该插件中已经导出了两个通用配置,分给为recommended和all,此时可以可以使用语法`plugin:[插件名称]/[配置名称]`继承使用
+
+```javascript
+module.exports = {
+  extends: [
+    'standard',   // 来自于eslint-config-standard
+    'plugin:react/recommended'
+  ]
+}
 
 
 
+```
+**如何保持团队代码风格的统一性**
+
+我会从以下四个层层递进的角度去分析
+
+1. 在编辑器的角度来看:
+
+首先我们要考虑到不同开发小伙伴使用的编辑器不同,不同编辑器对代码风格有不同的习惯,如是否最后一行留空,此时就需要editorConfig了,参考下文的editorConfig部分
+
+2. 在编写代码的角度看
+
+如果是vscode,安装eslint插件,如果使用vue开发,推荐安装vetur插件,然后配置vue的格式化工具为vetur
+
+安装此插件时需要在项目下同步安装eslint依赖,插件依赖于此模块.
+
+如果是第一次操作，代码中会有波浪线，点击快速修复，vscode会弹窗提示你是否允许eslint插件访问node_modules下的eslint模块将其作为依赖,允许即可，也可以应用到所有地方
+
+![image-20201230165839540](/Users/jasonhuang/Library/Application Support/typora-user-images/image-20201230165839540.png)
+
+注意eslint插件配置项随着插件版本的更新可能略有不同,且eslint只能设置保存时格式化,不能alt+shift+f,这一点和prettier有所不同
+
+```json
+{
+  // "eslint.autoFixOnSave": true语法已废弃
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  // 配置需要校验的文件类型
+  "eslint.validate.probe": [
+    "vue",
+    "javascript"
+  ],
+  "eslint.codeActionsOnSave.mode": "problems",
+  "editor.formatOnSave": false      // 关闭vscode插件的保存格式化
+}
+
+```
+
+需要注意,需要关闭`editor.formatOnSave`,如果你使用了vscode的内置格式化或者prettier的格式化,并设置了保存自动格式化之后,会出现保存以后修复两次,如果和eslint的规则冲突,还会显示警告,因此以上的配置应该被保存到工作区当中,即.vscode/settings.json中,并添加git追踪
+
+此时你编写的代码中,只要是不符合eslint规则的会给出智能提示,保存时会自动修复能被修复的部分
+
+另外standard官方也提供了cli和vscode插件,个人不建议安装,插件过多可能互相影响,冲突,eslint本身已经够用
 
 
+3. 在webpack构建的角度来看:
 
+如果你使用官方的cli工具`@vue/cli`和`create-react-app`,生成项目结构时会以交互式的方式询问你项目的配置,如对于@vue/cli 4.x版本,`vue create [project]`时,有以下询问
+
+`Pick additional lint features: Lint on save, Lint and fix on commit`
+
+`Lint on Save`表示是否在文件保存的时候lint代码,只是lint,不是修复,如果出现了不符合规范的代码,则会在控制台警告或者报错,需要自己手动修复,或者使用eslint --fix修复;如果使用eslint-loader来启动eslint,设置`fix: true`即可在保存代码触发webpack重新构建的同时进行fix格式化(非保存的概念)
+注意: eslint-loader已被官方废弃,<https://npmjs.com/package/eslint-loader>,采用了插件的写法.现在的@vue/cli 4.x版本仍采用的是eslint-loader
+
+`Lint and fix on commit`表示是否在git commit之前lint,参考以下第四点
+
+4. 在git提交之前的角度来看:
+
+以上两个步骤已然让你团队中的代码风格保持了通用性和一致性,然后总会有意外发生,比如有小伙伴没有安装插件,代码开发也没有按照规范化, 打包前也没有执行lint操作提提交到仓库的代码仍未进行格式化,此时就需要第三步的校验了.需要使用到的工具为`husky`和`lint-staged`.通过git hook在代码提交前强制lint
+
+关于git hook:
+
+即git的钩子,git操作时会触发的任务,如`pre-commit`,代表commit到本地仓库之前的钩子,通常为shell脚本
+
+使用`git init`初始化的项目仓库.git目录中有个hooks目录,里面有git hook的编写示例
+
+使用npm模块husky可以方便的进行git hook的配置而不需编写shell脚本
+
+在package.json中配置
+
+```json
+"husky": {
+  "scripts": {
+    "lint": "eslint --ext .js,.vue src"
+  },
+   "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,vue}": [
+      "vue-cli-service lint",
+      "git add"
+    ]
+  }
+}
+
+```
+
+此时git commit之前,会进行lint,然后再添加到暂存区,再进行commit即可
+
+经过以上四个步骤,整个项目的风格一定是保持统一且规范化的,但是我们也不要依赖于工具,需要自己养成良好习惯,写出规范的代码
+
+
+### prettier
+
+```bash
+npx prettier . --write   # 默认会将格式化后的结果输出到终端
+```
+
+整合prettier和eslint,需要做到
+
+- 禁用eslint的formatting rules,让prettier接管
+- lint执行时调用prettier格式化,再检查code-quality类规则
+
+`eslint-plugin-prettier`: 配置eslint使用prettier对代码格式化
+`eslint-config-prettier`: 关闭一些不必要的或者是与prettier冲突的lint选项
+
+### editorconfig
+
+控制不同编辑器的项目编码规范,优先级比编辑器自身设置要高,如果没有配置,则采用浏览器配置,多人开发项目时十分有用且必要.webstorm中默认支持,vscode需要安装插件Editconfig fom VS Code提供支持,否则默认不会直接解析.该插件会读取.editconfig中定义的规则,并覆盖user或workspace settings.json中对应配置.这里说一下user和workspace的区别,workspace的配置只会在当前项目中生效,此配置会保存于项目根目录下的.vscode/settings.json
+
+@vue/cli初始化的项目就生成了此配置文件
+
+**配置语法**
+
+editorconfig配置文件采取INI格式,斜杠/作为路径分隔符,#或者;作为注释
+属性不区分大小写
+
+路径通配符规则：
+
+| *        | 匹配除/之外任意字符串      |
+| -------- | -------------------------- |
+| **       | 匹配任意字符串             |
+| {a, b,c} | 匹配任意给定字符串         |
+| [name]   | 匹配指定字符串，如Makefile |
+
+.editorconfig
+
+```ini
+# 最顶层配置文件,最近的配置文件拥有优先权,设为true,停止向上查找
+root = true
+
+# 表示在对应的后缀文件应用规则
+[*.{js,jsx,ts.tsx,vue}]
+# 编码格式
+charset = utf-8
+# 设置缩进风格
+indent_style = space
+# 设置缩进深度,如果设置以上属性为tab,则此属性默认为tab_width
+indent_size = 2
+# 去除换行行首的任意空白字符
+trim_trailing_whitespace = true
+# 文件最后一行空白行结尾
+insert_final_newline = true
+
+# 设置子目录下的规则可以覆盖上面的
+[lib/**.js]
+indent_style = space
+# 设置确切文件
+[{package.json,.travis.yml}]
+
+
+```
+
+使用注意: editconfig和prettier一样,都是用来配置格式化代码的,配置规则要和lint工具相符,否则会出现格式化代码以后不能通过lint工具校验的情况
 
