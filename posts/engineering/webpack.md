@@ -570,7 +570,7 @@ module.exports = {
 }
 ```
 
-如果你使用vue开发,需要用到eslint-plugin-react插件,该插件中已经导出了两个通用配置,分给为recommended和all,此时可以可以使用语法`plugin:[插件名称]/[配置名称]`继承使用
+如果你使用react开发,需要用到eslint-plugin-react插件,该插件中已经导出了两个通用配置,分给为recommended和all,此时可以可以使用语法`plugin:[插件名称]/[配置名称]`继承使用
 
 ```javascript
 module.exports = {
@@ -580,95 +580,99 @@ module.exports = {
   ]
 }
 
-
-
 ```
+
+如果你使用vue开发,`@vue/cli`提供的风格配置默认继承'plugin:vue/recommended',该插件还向外暴露了recommended配置,这个规则比较全一点,包括vue template的风格
+
 **如何保持团队代码风格的统一性**
 
 我会从以下四个层层递进的角度去分析
 
 1. 在编辑器的角度来看:
 
-首先我们要考虑到不同开发小伙伴使用的编辑器不同,不同编辑器对代码风格有不同的习惯,如是否最后一行留空,此时就需要editorConfig了,参考下文的editorConfig部分
+  首先我们要考虑到不同开发小伙伴使用的编辑器不同,不同编辑器对代码风格有不同的习惯,如是否最后一行留空,此时就需要editorConfig了,参考下文的editorConfig部分
 
 2. 在编写代码的角度看
 
-如果是vscode,安装eslint插件,如果使用vue开发,推荐安装vetur插件,然后配置vue的格式化工具为vetur
+  如果是vscode,安装eslint插件,如果使用vue开发,推荐安装vetur插件,然后配置vue的格式化工具为vetur
 
-安装此插件时需要在项目下同步安装eslint依赖,插件依赖于此模块.
+  安装此插件时需要在项目下同步安装eslint依赖,插件依赖于此模块.
 
-如果是第一次操作，代码中会有波浪线，点击快速修复，vscode会弹窗提示你是否允许eslint插件访问node_modules下的eslint模块将其作为依赖,允许即可，也可以应用到所有地方
+  如果是第一次操作，代码中会有波浪线，点击快速修复，vscode会弹窗提示你是否允许eslint插件访问node_modules下的eslint模块将其作为依赖,允许即可，也可以应用到所有地方
 
-![image-20201230165839540](/Users/jasonhuang/Library/Application Support/typora-user-images/image-20201230165839540.png)
+  ![image-20201230165839540](/Users/jasonhuang/Library/Application Support/typora-user-images/image-20201230165839540.png)
 
-注意eslint插件配置项随着插件版本的更新可能略有不同,且eslint只能设置保存时格式化,不能alt+shift+f,这一点和prettier有所不同
+  注意eslint插件配置项随着插件版本的更新可能略有不同,且eslint只能设置保存时格式化,不能alt+shift+f,这一点和prettier有所不同
 
-```json
-{
-  // "eslint.autoFixOnSave": true语法已废弃
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
-  },
-  // 配置需要校验的文件类型
-  "eslint.validate.probe": [
-    "vue",
-    "javascript"
-  ],
-  "eslint.codeActionsOnSave.mode": "problems",
-  "editor.formatOnSave": false      // 关闭vscode插件的保存格式化
-}
+  ```json
+  {
+    // "eslint.autoFixOnSave": true语法已废弃
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    // 配置需要校验的文件类型
+    "eslint.validate.probe": [
+      "vue",
+      "javascript"
+    ],
+    "eslint.codeActionsOnSave.mode": "problems",
+    "editor.formatOnSave": false      // 关闭vscode插件的保存格式化
+  }
 
-```
+  ```
 
-需要注意,需要关闭`editor.formatOnSave`,如果你使用了vscode的内置格式化或者prettier的格式化,并设置了保存自动格式化之后,会出现保存以后修复两次,如果和eslint的规则冲突,还会显示警告,因此以上的配置应该被保存到工作区当中,即.vscode/settings.json中,并添加git追踪
+  需要注意,需要关闭`editor.formatOnSave`,如果你使用了vscode的内置格式化或者prettier的格式化,并设置了保存自动格式化之后,会出现保存以后修复两次,如果和eslint的规则冲突,还会显示警告,因此以上的配置应该被保存到工作区当中,即.vscode/settings.json中,并添加git追踪
 
-此时你编写的代码中,只要是不符合eslint规则的会给出智能提示,保存时会自动修复能被修复的部分
+  如果你想开发项目中的所有人的vscode都安装共用的插件,则可以在项目根目录下的.vscode/extensions.json中配置统一插件,如
 
-另外standard官方也提供了cli和vscode插件,个人不建议安装,插件过多可能互相影响,冲突,eslint本身已经够用
+  此时你编写的代码中,只要是不符合eslint规则的会给出智能提示,保存时会自动修复能被修复的部分
+
+  另外standard官方也提供了cli和vscode插件,个人不建议安装,插件过多可能互相影响,冲突,eslint本身已经够用
 
 
 3. 在webpack构建的角度来看:
 
-如果你使用官方的cli工具`@vue/cli`和`create-react-app`,生成项目结构时会以交互式的方式询问你项目的配置,如对于@vue/cli 4.x版本,`vue create [project]`时,有以下询问
+  如果你使用官方的cli工具`@vue/cli`和`create-react-app`,生成项目结构时会以交互式的方式询问你项目的配置,如对于@vue/cli 4.x版本,`vue create [project]`时,有以下询问
 
-`Pick additional lint features: Lint on save, Lint and fix on commit`
+  `Pick additional lint features: Lint on save, Lint and fix on commit`
 
-`Lint on Save`表示是否在文件保存的时候lint代码,只是lint,不是修复,如果出现了不符合规范的代码,则会在控制台警告或者报错,需要自己手动修复,或者使用eslint --fix修复;如果使用eslint-loader来启动eslint,设置`fix: true`即可在保存代码触发webpack重新构建的同时进行fix格式化(非保存的概念)
-注意: eslint-loader已被官方废弃,<https://npmjs.com/package/eslint-loader>,采用了插件的写法.现在的@vue/cli 4.x版本仍采用的是eslint-loader
+  `Lint on Save`表示是否在文件保存的时候lint代码,只是lint,不是修复,如果出现了不符合规范的代码,则会在控制台警告或者报错,需要自己手动修复,或者使用eslint --fix修复;如果使用eslint-loader来启动eslint,设置`fix: true`即可在保存代码触发webpack重新构建的同时进行fix格式化(非保存的概念)
 
-`Lint and fix on commit`表示是否在git commit之前lint,参考以下第四点
+  注意: eslint-loader已被官方废弃,<https://npmjs.com/package/eslint-loader>,采用了插件的写法.现在的@vue/cli 4.x版本仍采用的是eslint-loader
+
+  `Lint and fix on commit`表示是否在git commit之前lint,参考以下第四点
 
 4. 在git提交之前的角度来看:
 
-以上两个步骤已然让你团队中的代码风格保持了通用性和一致性,然后总会有意外发生,比如有小伙伴没有安装插件,代码开发也没有按照规范化, 打包前也没有执行lint操作提提交到仓库的代码仍未进行格式化,此时就需要第三步的校验了.需要使用到的工具为`husky`和`lint-staged`.通过git hook在代码提交前强制lint
+  以上两个步骤已然让你团队中的代码风格保持了通用性和一致性,然后总会有意外发生,比如有小伙伴没有安装插件,代码开发也没有按照规范化, 打包前也没有执行lint操作提提交到仓库的代码仍未进行格式化,此时就需要第三步的校验了.需要使用到的工具为`husky`和`lint-staged`.通过git hook在代码提交前强制lint
 
-关于git hook:
+  关于git hook:
 
-即git的钩子,git操作时会触发的任务,如`pre-commit`,代表commit到本地仓库之前的钩子,通常为shell脚本
+  即git的钩子,git操作时会触发的任务,如`pre-commit`,代表commit到本地仓库之前的钩子,通常为shell脚本
 
-使用`git init`初始化的项目仓库.git目录中有个hooks目录,里面有git hook的编写示例
+  使用`git init`初始化的项目仓库.git目录中有个hooks目录,里面有git hook的编写示例
 
-使用npm模块husky可以方便的进行git hook的配置而不需编写shell脚本
+  使用npm模块husky可以方便的进行git hook的配置而不需编写shell脚本
 
-在package.json中配置
+  在package.json中配置
 
-```json
-"husky": {
-  "scripts": {
-    "lint": "eslint --ext .js,.vue src"
-  },
-   "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,vue}": [
-      "vue-cli-service lint",
-      "git add"
-    ]
+  ```json
+  "husky": {
+    "scripts": {
+      "lint": "eslint --ext .js,.vue src"
+    },
+    "gitHooks": {
+      "pre-commit": "lint-staged"
+    },
+    "lint-staged": {
+      "*.{js,jsx,vue}": [
+        "vue-cli-service lint",
+        "git add"
+      ]
+    }
   }
-}
 
-```
+  ```
 
 此时git commit之前,会进行lint,然后再添加到暂存区,再进行commit即可
 

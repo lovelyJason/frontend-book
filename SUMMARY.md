@@ -14,6 +14,10 @@
     * [ECMAScript新特性](posts/javascript/ECMAScript新特性.md)
     * [typescript](posts/javascript/typescript.md)
     * [javascript性能优化](posts/javascript/javascript性能优化.md)
+    * [认识虚拟DOM](posts/javascript/认识虚拟DOM.md)
+* vue
+    * [实现mini-vue](posts/vue/实现mini-vue.md)
+    * [vue源码分析](posts/vue/vue源码分析.md)
 * 前端工程化
     * [yeoman](posts/engineering/yeoman.md)
     * [gulp](posts/engineering/gulp.md)
