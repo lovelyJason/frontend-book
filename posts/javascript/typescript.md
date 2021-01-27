@@ -207,17 +207,15 @@ module.exports = {
 ```javascript
 import 'core-js'
 
-var obj = {
+const obj = {
   name: 'zs',
   age: '18'
 };
-var entries = Object.entries(obj);
+const entries = Object.entries(obj);
 console.log(entries);
-var arr = [1, 2, 3, 4].map(function (val) {
-  (function (item) {
-    return item + 1;
-  });
-});
+const arr = [1, 2, 3, 4].map(val => {
+  return val + 1
+})
 console.log(arr);
 console.log(new Promise());
 ```
@@ -237,7 +235,9 @@ last 2 versions
 not dead
 ```
 
-此时的bundle.js开头会require引入`core-js`中的模块,会发现很多都是用不到的
+代表支持市场份额大于1%的浏览器,兼容各类浏览器的最近两个版本,而`dead`的意思就是在最近的两个版本中发现市场份额已经低于0.5%且24个月内没有更新,`not dead`则代表取反的意思啦
+
+此时的bundle.js开头会require引入`core-js/modules/`中的一堆模块,会发现很多都是用不到的
 
 - usage: 会参考目标浏览器和代码中使用的特性按需加载polyfill
 
@@ -247,6 +247,7 @@ not dead
 ```javascript
 "use strict";
 
+// 会require用到的模块,不会像上面entry一样引入很多不必要的模块
 require("core-js/modules/es.array.map.js");
 
 require("core-js/modules/es.object.entries.js");
@@ -262,11 +263,12 @@ var obj = {
 var entries = Object.entries(obj);
 console.log(entries);
 var arr = [1, 2, 3, 4].map(function (val) {
-  (function (item) {
-    return item + 1;
-  });
+  return val + 1;
 });
 console.log(arr);
+arr.includes(function (val) {
+  return val === 1;
+});
 console.log(new Promise());
 
 ```

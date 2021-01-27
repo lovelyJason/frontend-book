@@ -193,7 +193,33 @@ soucemap更多内容可参考阮一峰文章
 
   src/platforms/web/entry-runtime-with-compiler:
   打包入口,并且是包含编译器完整版的vue.在这个文件中,重写了runtime中的$mount()方法,增加了把模板编译成render函数的功能
-  还给Vue增加了compiler方法,可以帮助我手动将模板转化为render函数
+  还给Vue增加了compiler方法,可以帮助我们手动将模板转化为render函数
 
+
+```javascript
+var vm = new Vue({
+  el: '#app',
+  msg: 'hello vue'
+})
+```
+
+此时调用栈的顺序为
+
+## 响应式原理
+
+进入这部分源码之前先看一下以下常见问题
+
+- 重新给属性赋值为一个对象,是否是响应式的
+- 给数组元素赋值,视图是否会更新
+- 修改数组length,视图是否会更新
+- 数组的api如push等是否触发视图更新
+
+init.js > initState() > initData()
+
+在initData中调用proxy()把data成员注入vue实例,然后调用observer(data, true)
+
+在defineReactive给属性定义了getter和setter,getter中进行依赖收集,在我们访问这个属性的时候会进行依赖收集,
+
+实际上就是把依赖该数据的watcher对象添加到Dep的subs数组中,将来数据发生变更时,会调用Dep的notify()方法通知所有Watcher更新
 
 
