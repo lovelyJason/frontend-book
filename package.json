@@ -22,6 +22,7 @@
   "scripts": {
     "init": "gitbook init",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "gitbook serve",
     "build": "gitbook build"
   },
   "keywords": [],

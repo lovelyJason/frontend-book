@@ -18,6 +18,7 @@
 * vue
     * [实现mini-vue](posts/vue/实现mini-vue.md)
     * [vue源码分析](posts/vue/vue源码分析.md)
+    * [vuex数据流管理](posts/vue/vuex数据流管理.md)
 * 前端工程化
     * [yeoman](posts/engineering/yeoman.md)
     * [gulp](posts/engineering/gulp.md)
