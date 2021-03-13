@@ -36,7 +36,7 @@ Vuex的使用就不过多介绍了,官网也挺详细的,主要就是`store`中`
 
 另外为了简化以上操作,可以使用`mapState`,`mapGetters`,`mapMutions`,`mapActions`将对应的值或函数映射到`computed`,`methods`中
 
-需要说明一下的是,其实视图中是可以直接更改`$store.state`中的数据,无疑破坏了使用Vuex的初衷,我们期望所有状态的变更是通过提交`mutations`和派发`actions`的,可以在`Vuex.Store()`初始化的时候设置`strict`为true,即可开启校验,如果直接更新state,会抛出错误;注意不要在生产环境中开启严格模式,这个选项会消耗较多性能
+需要说明一下的是,其实视图中是可以直接更改`$store.state`中的数据,无疑破坏了使用Vuex的初衷,我们期望所有状态的变更是通过提交`mutations`和派发`actions`的,可以在`Vuex.Store()`初始化的时候设置`strict`为`true`,即可开启校验,如果直接更新state,会抛出错误;注意不要在生产环境中开启严格模式,这个选项会消耗较多性能
 
 这里之所以更新状态分为同步和异步,是为了让我们的程序可以方便调试,能够更好的使用Vue devtools的时光旅行功能进行调试跟踪状态
 
