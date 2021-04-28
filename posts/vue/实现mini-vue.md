@@ -10,7 +10,7 @@
 
 处理数据的响应式入口
 
-```javascript
+```javascript:Observer.js
 class Observer {
   constructor (data) {
     this.walk(data)
@@ -56,7 +56,7 @@ class Observer {
 
 ## Dep
 
-```javascript
+```javascript:Dep.js
 class Dep {
   constructor () {
     // 存储所有的观察者
@@ -79,7 +79,7 @@ class Dep {
 
 ## watcher
 
-```javascript
+```javascript:Watcher.js
 class Watcher {
   constructor (vm, key, cb) {
     this.vm = vm
@@ -107,7 +107,7 @@ class Watcher {
 
 ## compiler
 
-```javascript
+```javascript:compiler.js
 class Compiler {
   constructor (vm) {
     this.el = vm.$el

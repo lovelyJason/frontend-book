@@ -1451,6 +1451,13 @@ gitbook-plugin-lightbox@^1.2.0:
     cheerio "^1.0.0-rc.2"
     uuid "^3.3.2"
 
+gitbook-plugin-sectionx@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/gitbook-plugin-sectionx/-/gitbook-plugin-sectionx-3.1.0.tgz#611c69d8a98743f28a7f455241d02f500d2f2c52"
+  integrity sha1-YRxp2KmHQ/KKf0VSQdAvUA0vLFI=
+  dependencies:
+    cheerio "*"
+
 gitbook-plugin-splitter@^0.0.8:
   version "0.0.8"
   resolved "https://registry.npm.taobao.org/gitbook-plugin-splitter/download/gitbook-plugin-splitter-0.0.8.tgz#f2b0513060fc9266b46b04182e4eca1d4b71fafc"
@@ -1462,6 +1469,11 @@ gitbook-plugin-tbfed-pagefooter@0.0.1:
   integrity sha1-Fu54QGLdhQQmTEd+h2X8ScQb7T0=
   dependencies:
     moment "^2.10.6"
+
+gitbook-plugin-theme-fexa@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/gitbook-plugin-theme-fexa/-/gitbook-plugin-theme-fexa-1.0.6.tgz#d3cdd2b26cb044ae4765978914eb8c3eaca79ee0"
+  integrity sha512-Yl/YbGq8E4lplZQB8fkUr78OJfJ9KE4xqYCKel/Zk0RriIIFbCqhYvwGldsneUbn5Za/Wr5+tYrhHqYyRRvlqw==
 
 github-slugid@1.0.1:
   version "1.0.1"

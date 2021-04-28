@@ -149,8 +149,8 @@ class Dog extends Animal {
 定义函数,接口,类的时候没有定义具体的类型,使用的时候再指定具体类型,方便复用代码
 
 ```typescript
-// 调用函数时传递具体类型
-function createArray<T> (length: number, value: T): T:[] {
+// 调用函数时传递具体类型,一般使用T作为泛型参数
+function createArray<T> (length: number, value: T): T[] {    // T[] 可以写成 Array<T>
   return Array<T>(length).fill(value)   // Array默认创建的是any类型
 }
 

@@ -9,8 +9,20 @@
     "lightbox",
     "anchor-navigation-ex",
     "click-reveal",
-    "copy-code-button"
+    "copy-code-button",
+    "sectionx"
   ],
+  "variables": {
+    "themeFexa": {
+      "nav": [
+        {
+          "url": "http://...",
+          "target": "_blank",
+          "name": "简易教程"
+        }
+      ]
+    }
+  },
   "pluginsConfig": {
     "tbfed-pagefooter": {
       "copyright": "Jason Huang",
@@ -18,10 +30,20 @@
       "modify_format": "YYYY-MM-DD HH:mm:ss"
     },
     "hide-element": {
-      "elements": [".gitbook-link"]
+      "elements": [
+        ".gitbook-link"
+      ]
     },
     "anchor-navigation-ex": {
       "showGoTop": false
+    },
+    "sectionx": {
+      "tag": "b"
+    },
+    "theme-fexa": {
+      "search-placeholder": "输入关键字搜索",
+      "logo": "./logo.png",
+      "favicon": "./favicon.ico"
     }
   }
 }
